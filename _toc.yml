@@ -6,9 +6,9 @@
 
 - file: problem
   sections:
-    - file: problem/01-collecting-dependent-types
-    - file: problem/02-linear-decidable-equality
+    - file: problem/collecting-dependent-types
+    - file: problem/linear-decidable-equality
 
 - file: solution
   sections:
-    - file: solution/01-quantifiers
+    - file: solution/quantifiers
