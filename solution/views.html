@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>List Quantifiers &#8212; Catching Tears in the Rain---Curating Idioms for Dependently-Typed Programming</title>
+    <title>Views &amp; Covering Functions &#8212; Catching Tears in the Rain---Curating Idioms for Dependently-Typed Programming</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -54,7 +54,7 @@
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Solutions" href="../solution.html" />
+    <link rel="prev" title="Quantifiers" href="predicates/quantifiers.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -96,13 +96,18 @@
   </a>
   <ul class="collapse-ul">
    <li class="toctree-l2">
-    <a class="reference internal" href="../problem/01-collecting-dependent-types.html">
+    <a class="reference internal" href="../problem/collecting-dependent-types.html">
      Collecting Dependent Types
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../problem/02-linear-decidable-equality.html">
+    <a class="reference internal" href="../problem/linear-decidable-equality.html">
      Linear-Time Decidable Equality.
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../problem/computing-efficiently-over-inefficient-data-structures.html">
+     Efficient Computation Over Inefficient Structure
     </a>
    </li>
   </ul>
@@ -114,9 +119,23 @@
    Solutions
   </a>
   <ul class="current collapse-ul">
+   <li class="toctree-l2 collapsible-parent">
+    <a class="reference internal" href="predicates.html">
+     Predicates
+    </a>
+    <ul class="collapse-ul">
+     <li class="toctree-l3">
+      <a class="reference internal" href="predicates/quantifiers.html">
+       Quantifiers
+      </a>
+     </li>
+    </ul>
+    <i class="fas fa-chevron-down">
+    </i>
+   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     List Quantifiers
+     Views &amp; Covering Functions
     </a>
    </li>
   </ul>
@@ -163,7 +182,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/solution/01-quantifiers.md"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/solution/views.md"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.md</button></a>
         <!-- Download PDF via print -->
@@ -183,7 +202,7 @@
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/jfdm/tears-in-the-rain//issues/new?title=Issue%20on%20page%20%2Fsolution/01-quantifiers.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/jfdm/tears-in-the-rain//issues/new?title=Issue%20on%20page%20%2Fsolution/views.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -212,8 +231,40 @@
         
               <div>
                 
-  <div class="section" id="list-quantifiers">
-<h1>List Quantifiers<a class="headerlink" href="#list-quantifiers" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="views-covering-functions">
+<h1>Views &amp; Covering Functions<a class="headerlink" href="#views-covering-functions" title="Permalink to this headline">¶</a></h1>
+<p>Views are when we use a dependent type to view a data structure differently to how it is represented.
+This is useful when pattern matching directly on the structure is cumbersome, or innefficient.</p>
+<p>Take, for example, the list data type we can construct a view that presents the elements two at a time.
+It is important to note that <code class="docutils literal notranslate"><span class="pre">Views</span></code> must cover all patterns, otherwise the data structure is a predicate.
+Which is why we must also taken into account a list with an odd number of elements.</p>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">View</span> <span class="ow">:</span> <span class="ow">(</span>input <span class="ow">:</span> <span class="kt">List</span> a<span class="ow">)</span>
+                  <span class="ow">-&gt;</span> <span class="kt">Type</span>
+  <span class="kr">where</span>
+    <span class="nf">Empty</span> <span class="ow">:</span> <span class="kt">View</span> <span class="kt">Nil</span>
+    <span class="nf">One</span>   <span class="ow">:</span> <span class="ow">(</span>x <span class="ow">:</span> a<span class="ow">)</span>
+              <span class="ow">-&gt;</span> <span class="kt">View</span> <span class="ow">(</span>x<span class="ow">::</span><span class="kt">Nil</span><span class="ow">)</span>
+
+    <span class="nf">PairOdd</span> <span class="ow">:</span> <span class="ow">(</span>x <span class="ow">:</span> a<span class="ow">)</span>
+           <span class="ow">-&gt;</span> <span class="ow">(</span>rest <span class="ow">:</span> <span class="kt">View</span> xs<span class="ow">)</span>
+                   <span class="ow">-&gt;</span> <span class="kt">View</span> <span class="ow">(</span>x<span class="ow">::</span>xs<span class="ow">)</span>
+
+    <span class="nf">Pair</span>  <span class="ow">:</span> <span class="ow">(</span>x,y  <span class="ow">:</span> a<span class="ow">)</span>
+         <span class="ow">-&gt;</span> <span class="ow">(</span>rest <span class="ow">:</span> <span class="kt">View</span> xs<span class="ow">)</span>
+                 <span class="ow">-&gt;</span> <span class="kt">View</span> <span class="ow">(</span>x<span class="ow">::</span>y<span class="ow">::</span>xs<span class="ow">)</span>
+</pre></div>
+</div>
+<p>We can then construct a <em>covering</em> function to compute the view.</p>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="nf">view</span> <span class="ow">:</span> <span class="ow">(</span>input <span class="ow">:</span> <span class="kt">List</span> a<span class="ow">)</span>
+             <span class="ow">-&gt;</span> <span class="kt">View</span> input
+view <span class="ow">[]</span> <span class="ow">=</span> <span class="kt">Empty</span>
+view <span class="ow">(</span>x <span class="ow">::</span> xs<span class="ow">)</span> <span class="kr">with</span> <span class="ow">(</span>view xs<span class="ow">)</span>
+  view <span class="ow">(</span>x <span class="ow">::</span> <span class="ow">[])</span> <span class="ow">|</span> <span class="kt">Empty</span> <span class="ow">=</span> <span class="kt">One</span> x
+  view <span class="ow">(</span>x <span class="ow">::</span> <span class="ow">[</span>y<span class="ow">])</span> <span class="ow">|</span> <span class="ow">(</span><span class="kt">One</span> y<span class="ow">)</span> <span class="ow">=</span> <span class="kt">Pair</span> x y <span class="kt">Empty</span>
+  view <span class="ow">(</span>x <span class="ow">::</span> <span class="ow">(</span>y <span class="ow">::</span> xs<span class="ow">))</span> <span class="ow">|</span> <span class="ow">(</span><span class="kt">PairOdd</span> y rest<span class="ow">)</span> <span class="ow">=</span> <span class="kt">Pair</span> x y rest
+  view <span class="ow">(</span>x <span class="ow">::</span> <span class="ow">(</span>y <span class="ow">::</span> <span class="ow">(</span>z <span class="ow">::</span> xs<span class="ow">)))</span> <span class="ow">|</span> <span class="ow">(</span><span class="kt">Pair</span> y z rest<span class="ow">)</span> <span class="ow">=</span> <span class="kt">PairOdd</span> x <span class="ow">(</span><span class="kt">Pair</span> y z rest<span class="ow">)</span>
+</pre></div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
@@ -241,7 +292,7 @@
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="../solution.html" title="previous page">Solutions</a>
+    <a class='left-prev' id="prev-link" href="predicates/quantifiers.html" title="previous page">Quantifiers</a>
 
         </div>
         

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collecting Dependent Types &#8212; Catching Tears in the Rain---Curating Idioms for Dependently-Typed Programming</title>
+    <title>Linear-Time Decidable Equality. &#8212; Catching Tears in the Rain---Curating Idioms for Dependently-Typed Programming</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -54,8 +54,8 @@
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Linear-Time Decidable Equality." href="02-linear-decidable-equality.html" />
-    <link rel="prev" title="Problems" href="../problem.html" />
+    <link rel="next" title="Efficient Computation Over Inefficient Structure" href="computing-efficiently-over-inefficient-data-structures.html" />
+    <link rel="prev" title="Collecting Dependent Types" href="collecting-dependent-types.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -96,14 +96,19 @@
    Problems
   </a>
   <ul class="current collapse-ul">
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="collecting-dependent-types.html">
      Collecting Dependent Types
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="02-linear-decidable-equality.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      Linear-Time Decidable Equality.
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="computing-efficiently-over-inefficient-data-structures.html">
+     Efficient Computation Over Inefficient Structure
     </a>
    </li>
   </ul>
@@ -115,9 +120,23 @@
    Solutions
   </a>
   <ul class="collapse-ul">
+   <li class="toctree-l2 collapsible-parent">
+    <a class="reference internal" href="../solution/predicates.html">
+     Predicates
+    </a>
+    <ul class="collapse-ul">
+     <li class="toctree-l3">
+      <a class="reference internal" href="../solution/predicates/quantifiers.html">
+       Quantifiers
+      </a>
+     </li>
+    </ul>
+    <i class="fas fa-chevron-down">
+    </i>
+   </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../solution/01-quantifiers.html">
-     List Quantifiers
+    <a class="reference internal" href="../solution/views.html">
+     Views &amp; Covering Functions
     </a>
    </li>
   </ul>
@@ -164,7 +183,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/problem/01-collecting-dependent-types.md"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/problem/linear-decidable-equality.md"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.md</button></a>
         <!-- Download PDF via print -->
@@ -184,7 +203,7 @@
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/jfdm/tears-in-the-rain//issues/new?title=Issue%20on%20page%20%2Fproblem/01-collecting-dependent-types.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/jfdm/tears-in-the-rain//issues/new?title=Issue%20on%20page%20%2Fproblem/linear-decidable-equality.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -212,6 +231,11 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example">
+   Example
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#solutions">
    Solutions
   </a>
@@ -228,33 +252,70 @@
         
               <div>
                 
-  <div class="section" id="collecting-dependent-types">
-<h1>Collecting Dependent Types<a class="headerlink" href="#collecting-dependent-types" title="Permalink to this headline">¶</a></h1>
-<p>Given the following dependently typed data structure:</p>
-<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">Vect</span> <span class="ow">:</span> <span class="ow">(</span>size <span class="ow">:</span> <span class="kt">Nat</span><span class="ow">)</span>
-         <span class="ow">-&gt;</span> <span class="ow">(</span>type <span class="ow">:</span> <span class="kt">Type</span><span class="ow">)</span>
-                 <span class="ow">-&gt;</span> <span class="kt">Type</span>
-  <span class="kr">where</span>
-    <span class="nf">Empty</span> <span class="ow">:</span> <span class="kt">Vect</span> <span class="kt">Z</span> type
-    <span class="nf">Cons</span>  <span class="ow">:</span> <span class="ow">(</span>head <span class="ow">:</span> type<span class="ow">)</span>
-         <span class="ow">-&gt;</span> <span class="ow">(</span>tail <span class="ow">:</span> <span class="kt">Vect</span>    size  type<span class="ow">)</span>
-                 <span class="ow">-&gt;</span> <span class="kt">Vect</span> <span class="ow">(</span><span class="kt">S</span> size<span class="ow">)</span> type
-</pre></div>
-</div>
-<p>The definition of <code class="docutils literal notranslate"><span class="pre">Vect</span></code> is parameterised by the size of the vector and indexed by its type.
-This makes collecting <code class="docutils literal notranslate"><span class="pre">Vect</span></code> data structures harder.
-If we use <code class="docutils literal notranslate"><span class="pre">List</span></code> or <code class="docutils literal notranslate"><span class="pre">Vect</span></code> we introduce an invariant that all the lists must have the same type.</p>
-<p>For example:</p>
-<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="nf">vs</span> <span class="ow">:</span> <span class="kt">List</span> <span class="ow">(</span><span class="kt">Vect</span> <span class="mi">1</span> <span class="kt">Nat</span><span class="ow">)</span>
-vs <span class="ow">=</span> <span class="ow">[(</span><span class="kt">Cons</span> <span class="mi">1</span> <span class="kt">Empty</span><span class="ow">)</span>, <span class="ow">(</span><span class="kt">Cons</span> <span class="mi">2</span> <span class="kt">Empty</span><span class="ow">)]</span>
+  <div class="section" id="linear-time-decidable-equality">
+<h1>Linear-Time Decidable Equality.<a class="headerlink" href="#linear-time-decidable-equality" title="Permalink to this headline">¶</a></h1>
+<p>This problem is about decidable equality.</p>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="nn">Decidable.Equality</span>
 
-<span class="nf">ms</span> <span class="ow">:</span> <span class="kt">Vect</span> <span class="mi">2</span> <span class="ow">(</span><span class="kt">Vect</span> <span class="mi">1</span> <span class="kt">Nat</span><span class="ow">)</span>
-ms <span class="ow">=</span> <span class="kt">Cons</span> <span class="ow">(</span><span class="kt">Cons</span> <span class="mi">1</span> <span class="kt">Empty</span><span class="ow">)</span>
-          <span class="ow">(</span><span class="kt">Cons</span> <span class="ow">(</span><span class="kt">Cons</span> <span class="mi">2</span> <span class="kt">Empty</span><span class="ow">)</span>
-                <span class="kt">Empty</span><span class="ow">)</span>
+<span class="ow">%</span><span class="kr">default</span> <span class="kr">total</span>
 </pre></div>
 </div>
-<p>A question arises how to collect these types in a collection?</p>
+<p>Given the following data type:</p>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">Fruit</span> <span class="ow">=</span> <span class="kt">Apple</span> <span class="ow">|</span> <span class="kt">Orange</span> <span class="ow">|</span> <span class="kt">Pear</span> <span class="ow">|</span> <span class="kt">Peach</span>
+</pre></div>
+</div>
+<p>creating a decidable equality instance <code class="docutils literal notranslate"><span class="pre">DecEq</span></code> requires pairwise comparison of each structure.
+We can already reduce the number of contraditions using <code class="docutils literal notranslate"><span class="pre">negEqSym</span></code></p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>For example:</p>
+<div class="dropdown admonition">
+<p class="admonition-title">Click the button to reveal the contradictions!</p>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="nf">appleNoOrange</span> <span class="ow">:</span> <span class="kt">Apple</span> <span class="ow">===</span> <span class="kt">Orange</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+appleNoOrange <span class="kr">_</span> <span class="kr">impossible</span>
+
+<span class="nf">appleNoPear</span> <span class="ow">:</span> <span class="kt">Apple</span> <span class="ow">===</span> <span class="kt">Pear</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+appleNoPear <span class="kr">_</span> <span class="kr">impossible</span>
+
+<span class="nf">appleNoPeach</span> <span class="ow">:</span> <span class="kt">Apple</span> <span class="ow">===</span> <span class="kt">Peach</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+appleNoPeach <span class="kr">_</span> <span class="kr">impossible</span>
+
+<span class="nf">orangeNoPear</span> <span class="ow">:</span> <span class="kt">Orange</span> <span class="ow">===</span> <span class="kt">Pear</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+orangeNoPear <span class="kr">_</span> <span class="kr">impossible</span>
+
+<span class="nf">orangeNoPeach</span> <span class="ow">:</span> <span class="kt">Orange</span> <span class="ow">===</span> <span class="kt">Peach</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+orangeNoPeach <span class="kr">_</span> <span class="kr">impossible</span>
+
+<span class="nf">pearNoPeach</span> <span class="ow">:</span> <span class="kt">Pear</span> <span class="ow">===</span> <span class="kt">Peach</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+pearNoPeach <span class="kr">_</span> <span class="kr">impossible</span>
+</pre></div>
+</div>
+</div>
+<div class="highlight-idris notranslate"><div class="highlight"><pre><span></span><span class="kt">DecEq</span> <span class="kt">Fruit</span> <span class="kr">where</span>
+
+  decEq <span class="kt">Apple</span> <span class="kt">Apple</span>  <span class="ow">=</span> <span class="kt">Yes</span> <span class="kt">Refl</span>
+  decEq <span class="kt">Apple</span> <span class="kt">Orange</span> <span class="ow">=</span> <span class="kt">No</span> appleNoOrange
+  decEq <span class="kt">Apple</span> <span class="kt">Pear</span>   <span class="ow">=</span> <span class="kt">No</span> appleNoPear
+  decEq <span class="kt">Apple</span> <span class="kt">Peach</span>  <span class="ow">=</span> <span class="kt">No</span> appleNoPeach
+
+  decEq <span class="kt">Orange</span> <span class="kt">Apple</span>  <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym appleNoOrange<span class="ow">)</span>
+  decEq <span class="kt">Orange</span> <span class="kt">Orange</span> <span class="ow">=</span> <span class="kt">Yes</span> <span class="kt">Refl</span>
+  decEq <span class="kt">Orange</span> <span class="kt">Pear</span>   <span class="ow">=</span> <span class="kt">No</span> orangeNoPear
+  decEq <span class="kt">Orange</span> <span class="kt">Peach</span>  <span class="ow">=</span> <span class="kt">No</span> orangeNoPeach
+
+  decEq <span class="kt">Pear</span> <span class="kt">Apple</span>  <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym appleNoPear<span class="ow">)</span>
+  decEq <span class="kt">Pear</span> <span class="kt">Orange</span> <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym orangeNoPear<span class="ow">)</span>
+  decEq <span class="kt">Pear</span> <span class="kt">Pear</span>   <span class="ow">=</span> <span class="kt">Yes</span> <span class="kt">Refl</span>
+  decEq <span class="kt">Pear</span> <span class="kt">Peach</span>  <span class="ow">=</span> <span class="kt">No</span> pearNoPeach
+
+  decEq <span class="kt">Peach</span> <span class="kt">Apple</span>  <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym appleNoPeach<span class="ow">)</span>
+  decEq <span class="kt">Peach</span> <span class="kt">Orange</span> <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym orangeNoPeach<span class="ow">)</span>
+  decEq <span class="kt">Peach</span> <span class="kt">Pear</span>   <span class="ow">=</span> <span class="kt">No</span> <span class="ow">(</span>negEqSym pearNoPeach<span class="ow">)</span>
+  decEq <span class="kt">Peach</span> <span class="kt">Peach</span>  <span class="ow">=</span> <span class="kt">Yes</span> <span class="kt">Refl</span>
+</pre></div>
+</div>
+<p>This approach, however, still requires pairwise comparison of each structure.</p>
+</div>
 <div class="section" id="solutions">
 <h2>Solutions<a class="headerlink" href="#solutions" title="Permalink to this headline">¶</a></h2>
 <p>Here we link to solutions that can solve this problem.</p>
@@ -286,8 +347,8 @@ ms <span class="ow">=</span> <span class="kt">Cons</span> <span class="ow">(</sp
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="../problem.html" title="previous page">Problems</a>
-    <a class='right-next' id="next-link" href="02-linear-decidable-equality.html" title="next page">Linear-Time Decidable Equality.</a>
+    <a class='left-prev' id="prev-link" href="collecting-dependent-types.html" title="previous page">Collecting Dependent Types</a>
+    <a class='right-next' id="next-link" href="computing-efficiently-over-inefficient-data-structures.html" title="next page">Efficient Computation Over Inefficient Structure</a>
 
         </div>
         
