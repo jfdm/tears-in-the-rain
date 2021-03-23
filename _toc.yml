@@ -11,5 +11,7 @@
     - file: problem/computing-efficiently-over-inefficient-data-structures
 - file: solution
   sections:
-    - file: solution/quantifiers
+    - file: solution/predicates
+      sections:
+        - file: solution/predicates/quantifiers
     - file: solution/views
