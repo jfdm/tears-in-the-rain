@@ -7,13 +7,13 @@ For example, take a list.
 We can construct a predicate to capture if the list is empty or not.
 
 ```idris
- data IsEmpty : (input : List a)
+ data NonEmpty : (input : List a)
                      -> Type
   where
-    YesIsEmpty : IsEmpty (x::xs)
+    YesNonEmpty : NonEmpty (x::xs)
 ```
 
-Here the `YesIsEmpty` data constructor of `IsEmpty` presents the only case where a list is non-empty: When there is at least a single element in the list.
+Here the `YesNonEmpty` data constructor of `NonEmpty` presents the only case where a list is non-empty: When there is at least a single element in the list.
 
 It is a good idea to construct the corresponding _decision procedure_ for the predicate.
 Decision procedures are functions that construct the predicates using the given input.
@@ -21,7 +21,7 @@ These procedures will fail.
 
 When constructing these procedures you can either use `Dec` to provide a formal decision procedure that provides evidence why the predicate failed, or use `Maybe` to skip the provision of evidence.
 
-For example, here are two decision procedures for `IsEmpty`.
+For example, here are two decision procedures for `NonEmpty`.
 
 The first uses `Maybe`.
 
@@ -32,9 +32,9 @@ namespace UsingMaybe
 namespace UsingMaybe
 
   isEmpty : (input : List a)
-                  -> Maybe (IsEmpty input)
+                  -> Maybe (NonEmpty input)
   isEmpty [] = Nothing
-  isEmpty (x :: xs) = Just YesIsEmpty
+  isEmpty (x :: xs) = Just YesNonEmpty
 ```
 
 The second uses `Dec`.
@@ -42,11 +42,11 @@ The second uses `Dec`.
 ```idris
 namespace UsingDec
 
-  emptyList : IsEmpty Nil -> Void
-  emptyList YesIsEmpty impossible
+  emptyList : NonEmpty Nil -> Void
+  emptyList YesNonEmpty impossible
 
   isEmpty : (input : List a)
-                  -> Dec (IsEmpty input)
+                  -> Dec (NonEmpty input)
   isEmpty [] = No emptyList
-  isEmpty (x :: xs) = Yes YesIsEmpty
+  isEmpty (x :: xs) = Yes YesNonEmpty
 ```

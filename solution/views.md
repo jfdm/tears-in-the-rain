@@ -16,10 +16,6 @@ data View : (input : List a)
     One   : (x : a)
               -> View (x::Nil)
 
-    PairOdd : (x : a)
-           -> (rest : View xs)
-                   -> View (x::xs)
-
     Pair  : (x,y  : a)
          -> (rest : View xs)
                  -> View (x::y::xs)
@@ -33,9 +29,9 @@ We can then construct a _covering_ function to compute the view.
 view : (input : List a)
              -> View input
 view [] = Empty
-view (x :: xs) with (view xs)
-  view (x :: []) | Empty = One x
-  view (x :: [y]) | (One y) = Pair x y Empty
-  view (x :: (y :: xs)) | (PairOdd y rest) = Pair x y rest
-  view (x :: (y :: (z :: xs))) | (Pair y z rest) = PairOdd x (Pair y z rest)
+view (x :: []) = One x
+view (x :: (y :: xs)) with (view xs)
+  view (x :: (y :: [])) | Empty = Pair x y Empty
+  view (x :: (y :: [z])) | (One z) = Pair x y (One z)
+  view (x :: (y :: (z :: (w :: xs)))) | (Pair z w rest) = Pair x y (Pair z w rest)
 ```
